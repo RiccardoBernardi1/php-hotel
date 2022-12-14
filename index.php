@@ -39,7 +39,23 @@
         ],
 
     ];
-
+    function hotelsFilter($elm){
+        if(!empty($_GET["parking"])){
+            if(!empty($_GET["vote"])){
+                return $elm["parking"] == $_GET["parking"] && $elm["vote"] == $_GET["vote"];
+            }else{
+                if($_GET["parking"]==="true"){
+                    return $elm["parking"];
+                }else{
+                    return !$elm["parking"];
+                }
+            }
+        }elseif(!empty($_GET["vote"])){
+            return $elm["vote"] >= $_GET["vote"];
+        }else{
+            return true;
+        }
+    }
 ?>
 
 <!DOCTYPE html>
@@ -54,6 +70,34 @@
 </head>
 <body>
     <div class="container pt-5">
+        <form action="http://localhost/php-hotel/" method="GET">
+            <label for="parking" class="me-2">Filtra in base al parcheggio</label>
+            <select name="parking" id="parking" class="me-4">
+                <option value="" selected>Nessun Filtro</option>
+                <option value="true">Con Parcheggio</option>
+                <option value="false">Senza Parcheggio</option>
+            </select>
+            <label for="vote" class="me-2">Filtra in base al voto</label>
+            <select name="vote" id="vote" class="me-4">
+                <option value="" selected>Nessun Filtro</option>
+                <option value="1">
+                    1 stella
+                </option>
+                <option value="2">
+                    2 stelle
+                </option>
+                <option value="3">
+                    3 stelle
+                </option>
+                <option value="4">
+                    4 stelle
+                </option>
+                <option value="5">
+                    5 stelle
+                </option>
+            </select>
+            <button class="btn btn-primary" type="submit">Filtra Hotel</button>
+        </form>
         <table class="table table-striped-columns table-dark text-center mt-5">
             <thead>
                 <tr class="fs-5">
@@ -65,36 +109,37 @@
                 </tr>
             </thead>
             <tbody>
-                <?php foreach($hotels as $hotel){?>
+                <?php foreach(array_filter($hotels,"hotelsFilter") as $hotel){?>
                     <tr>
-                        <?php   foreach($hotel as $key => $info){
-                                    if($key==="name"){
-                                        echo "<th scope=\"row\">$info</th>";
-                                    }elseif($key==="parking"){
-                                        if($info){
-                                            echo "<td><i class=\"fa-solid fa-check\"></i></td>";
-                                        }else{
-                                            echo "<td><i class=\"fa-solid fa-xmark\"></i></td>";
-                                        }
-                                    }elseif($key==="vote"){
-                        ?>
-                                        <td>  
-                                            <?php
-                                            for($i=0;$i<5;$i++){
-                                                if($i<$info){
-                                                    echo "<i class=\"fa-solid fa-star\"></i>";
-                                                }else{
-                                                    echo "<i class=\"fa-regular fa-star\"></i>";
-                                                }
-                                            }
-                                            ?>
-                                        </td>
-                            <?php
+                        <?php   
+                            foreach($hotel as $key => $info){
+                                if($key==="name"){
+                                    echo "<th scope=\"row\">$info</th>";
+                                }elseif($key==="parking"){
+                                    if($info){
+                                        echo "<td><i class=\"fa-solid fa-check\"></i></td>";
                                     }else{
-                                        echo "<td>$info</td>";
+                                        echo "<td><i class=\"fa-solid fa-xmark\"></i></td>";
                                     }
+                                }elseif($key==="vote"){
+                        ?>
+                        <td>  
+                            <?php
+                            for($i=0;$i<5;$i++){
+                                if($i<$info){
+                                    echo "<i class=\"fa-solid fa-star\"></i>";
+                                }else{
+                                    echo "<i class=\"fa-regular fa-star\"></i>";
                                 }
+                            }
                             ?>
+                        </td>
+                        <?php
+                                }else{
+                                    echo "<td>$info</td>";
+                                }
+                            }
+                        ?>
                     </tr>
                 <?php } ?>
             </tbody>
